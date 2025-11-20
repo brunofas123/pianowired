@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIANO WIRED - Conversor Habbo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --habbo-blue-dark: #184c5c;
+            --habbo-blue-mid: #2d8297;
+            --habbo-blue-light: #59aeb8;
+            --habbo-orange: #e69e33;
+            --habbo-grey: #cecece;
+            --habbo-white: #ffffff;
+            --habbo-yellow: #ffff00;
+            --pixel-font: 'Press Start 2P', cursive;
+        }
+
+        body {
+            background-color: #9ad2db;
+            background-image: 
+                linear-gradient(45deg, #8cc0c9 25%, transparent 25%, transparent 75%, #8cc0c9 75%, #8cc0c9),
+                linear-gradient(45deg, #8cc0c9 25%, transparent 25%, transparent 75%, #8cc0c9 75%, #8cc0c9);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            font-family: var(--pixel-font);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #000;
+        }
+
+        .container {
+            background-color: var(--habbo-grey);
+            border: 4px solid var(--habbo-white);
+            outline: 4px solid var(--habbo-blue-dark);
+            padding: 15px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 10px 10px 0px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .header {
+            background-color: var(--habbo-blue-mid);
+            color: var(--habbo-white);
+            padding: 15px;
+            text-align: center;
+            border: 2px solid var(--habbo-blue-dark);
+            border-top-color: var(--habbo-blue-light);
+            border-left-color: var(--habbo-blue-light);
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 0px #000;
+        }
+
+        h1 { 
+            font-size: 20px; 
+            margin: 0 0 10px 0; 
+            line-height: 1.5;
+            text-shadow: 3px 3px 0px #000;
+        }
+
+        .header p {
+            font-size: 10px;
+            margin: 5px 0;
+            line-height: 1.5;
+        }
+
+        .header a {
+            color: var(--habbo-yellow);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--habbo-yellow);
+            transition: color 0.2s;
+        }
+        .header a:hover {
+            color: #fff;
+            border-bottom-color: #fff;
+        }
+
+        .panel {
+            background-color: #fff;
+            border: 2px solid #888;
+            border-right-color: #fff;
+            border-bottom-color: #fff;
+            padding: 10px;
+            margin-bottom: 15px;
+            box-shadow: inset 2px 2px 0px #888;
+            position: relative;
+        }
+
+        label {
+            font-size: 10px;
+            display: block;
+            margin-bottom: 5px;
+            color: var(--habbo-blue-dark);
+        }
+
+        textarea, input[type="text"] {
+            width: 100%;
+            font-family: var(--pixel-font);
+            font-size: 12px;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 2px solid #000;
+            background-color: #f0f0f0;
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        .options-bar {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            background: #e0e0e0;
+            padding: 5px;
+            border: 1px dashed #999;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            font-size: 9px;
+            cursor: pointer;
+            color: #333;
+        }
+        .checkbox-wrapper input { margin-right: 5px; cursor: pointer; }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+            background: #eee;
+            padding: 10px;
+            border: 2px solid #fff;
+            box-shadow: 2px 2px 0 #000;
+        }
+
+        button {
+            font-family: var(--pixel-font);
+            font-size: 10px;
+            padding: 10px 15px;
+            cursor: pointer;
+            background-color: var(--habbo-orange);
+            color: #fff;
+            border: 2px solid #8a5d1d;
+            border-top-color: #ffcc80;
+            border-left-color: #ffcc80;
+            text-shadow: 1px 1px 0 #000;
+            transition: transform 0.1s;
+        }
+
+        button:active {
+            transform: translate(2px, 2px);
+            border-top-color: #8a5d1d;
+            border-left-color: #8a5d1d;
+        }
+
+        button.play-btn { background-color: #57bb68; border-color: #2d6336; border-top-color: #8cefa0; border-left-color: #8cefa0; }
+        button.stop-btn { background-color: #d94343; border-color: #751b1b; border-top-color: #ff8787; border-left-color: #ff8787; }
+        button.clear-btn { background-color: #d94343; font-size: 8px; padding: 5px 10px; }
+
+        /* Speed Control Styling */
+        .speed-control {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 8px;
+            background: #ddd;
+            padding: 5px;
+            border: 1px inset #fff;
+        }
+        .speed-control input[type=range] {
+            width: 100px;
+            margin: 5px 0;
+            cursor: pointer;
+        }
+
+        .output-display {
+            background-color: #000;
+            color: #0f0;
+            padding: 15px;
+            font-size: 14px;
+            line-height: 1.6;
+            border: 4px solid #555;
+            min-height: 80px;
+            white-space: pre;
+            overflow-x: auto;
+        }
+
+        .note-char {
+            transition: color 0.05s, text-shadow 0.05s;
+        }
+
+        .note-active {
+            color: var(--habbo-yellow) !important;
+            text-shadow: 0 0 5px #ffaa00;
+            font-weight: bold;
+        }
+
+        .legend {
+            font-size: 8px;
+            margin-top: 5px;
+            color: #555;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .saved-list {
+            margin-top: 10px;
+            max-height: 120px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 5px;
+        }
+
+        .saved-item {
+            background: #e0e0e0;
+            padding: 5px;
+            margin-bottom: 5px;
+            font-size: 9px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #fff;
+            box-shadow: 1px 1px 0 #888;
+        }
+        
+        .saved-item span { cursor: pointer; color: #000; }
+        .saved-item span:hover { color: #0000aa; text-decoration: underline; }
+        .saved-item button { padding: 2px 5px; font-size: 8px; background-color: #d94343; }
+        
+        .keyboard-hint {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 10px;
+            font-size: 8px;
+            text-align: center;
+            background: #eee;
+            padding: 5px;
+            border: 1px dotted #888;
+        }
+        .row-hint { padding: 3px; }
+        .black-keys { color: #666; letter-spacing: 2px; }
+        .white-keys { color: #000; font-weight: bold; letter-spacing: 3px; }
+        
+        .group-box { border: 1px solid #999; margin-bottom: 5px; padding: 5px; background: #f9f9f9; }
+        .group-title { font-size: 8px; color: var(--habbo-blue-dark); margin-bottom: 2px; font-weight: bold; text-transform: uppercase;}
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>PIANO WIRED</h1>
+            <p>Converta cifras melódicas para as teclas do piano wired.</p>
+            <p>Acesse o site <a href="https://www.ciframelodica.com.br" target="_blank">www.ciframelodica.com.br</a> para extrair as cifras melódicas.</p>
+        </div>
+
+        <div class="panel">
+            <div style="display:flex; justify-content:space-between; align-items:end; margin-bottom:5px;">
+                <label for="inputNotes" style="margin:0;">Cole a música completa:</label>
+                <button class="clear-btn" onclick="clearInput()">LIMPAR TUDO</button>
+            </div>
+            
+            <textarea id="inputNotes" rows="6" placeholder="Ex:
+do do re do fa mi
+do do re do sol fa"></textarea>
+            
+            <div class="options-bar">
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" id="ignoreText" checked>
+                    Ignorar linhas sem notas
+                </label>
+            </div>
+
+            <div class="legend">
+                <span>Use apenas: do, re, mi, fa, sol, la, si</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button onclick="translateCipher()">TRADUZIR</button>
+            <button class="play-btn" onclick="playMusic()">TOCAR</button>
+            <button class="stop-btn" onclick="stopMusic()">PARAR</button>
+            
+            <div class="speed-control">
+                <label for="speedRange">Velocidade: <span id="speedVal">1.0x</span></label>
+                <input type="range" id="speedRange" min="0.5" max="2.0" step="0.1" value="1.0" oninput="updateSpeedDisplay(this.value)">
+            </div>
+        </div>
+
+        <div class="keyboard-hint">
+            <div class="group-box">
+                <div class="group-title">Agudas (DO RE MI...) - Parte Superior</div>
+                <div class="row-hint black-keys">Sustenidos: 2 3  5 6 7</div>
+                <div class="row-hint white-keys">Naturais: Q W E R T Y U</div>
+            </div>
+            <div class="group-box">
+                <div class="group-title">Graves (do re mi...) - Parte Inferior</div>
+                <div class="row-hint black-keys">Sustenidos: S D  G H J</div>
+                <div class="row-hint white-keys">Naturais: Z X C V B N M</div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <label>Resultado (Teclas):</label>
+            <div id="output" class="output-display">...</div>
+        </div>
+
+        <div class="panel" style="background-color: #dcdcdc;">
+            <label>Gravar Música:</label>
+            <div style="display: flex; gap: 5px; margin-bottom: 5px;">
+                <input type="text" id="songTitle" placeholder="Título da música">
+                <button onclick="saveSong()">GRAVAR</button>
+            </div>
+            <div class="saved-list" id="savedList"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- MAPEAMENTO DE NOTAS (INVERTIDO) ---
+        // Teclas Superiores (QWERTY / 12345) = AGUDAS (Oitava 5)
+        // Teclas Inferiores (ZXCVBN / ASDFG) = GRAVES (Oitava 4)
+
+        const notesMap = {
+            // === OITAVA 4 (GRAVES - MINÚSCULAS) -> Agora embaixo ===
+            'do':  { key: 'Z', freq: 261.63 },
+            're':  { key: 'X', freq: 293.66 },
+            'mi':  { key: 'C', freq: 329.63 },
+            'fa':  { key: 'V', freq: 349.23 },
+            'sol': { key: 'B', freq: 392.00 },
+            'la':  { key: 'N', freq: 440.00 },
+            'si':  { key: 'M', freq: 493.88 },
+            
+            // Sustenidos Graves -> Linha do meio
+            'do#': { key: 'S', freq: 277.18 }, 're#': { key: 'D', freq: 311.13 },
+            'fa#': { key: 'G', freq: 369.99 }, 'sol#':{ key: 'H', freq: 415.30 },
+            'la#': { key: 'J', freq: 466.16 },
+            
+            // Enarmonia Graves
+            'reb': { key: 'S', freq: 277.18 }, 'mib': { key: 'D', freq: 311.13 },
+            'solb':{ key: 'G', freq: 369.99 }, 'lab': { key: 'H', freq: 415.30 },
+            'sib': { key: 'J', freq: 466.16 },
+
+            // === OITAVA 5 (AGUDAS - MAIÚSCULAS) -> Agora em cima ===
+            'DO':  { key: 'Q', freq: 523.25 },
+            'RE':  { key: 'W', freq: 587.33 },
+            'MI':  { key: 'E', freq: 659.25 },
+            'FA':  { key: 'R', freq: 698.46 },
+            'SOL': { key: 'T', freq: 783.99 },
+            'LA':  { key: 'Y', freq: 880.00 },
+            'SI':  { key: 'U', freq: 987.77 },
+
+            // Sustenidos Agudos -> Linha de números
+            'DO#': { key: '2', freq: 554.37 }, 'RE#': { key: '3', freq: 622.25 },
+            'FA#': { key: '5', freq: 739.99 }, 'SOL#':{ key: '6', freq: 830.61 },
+            'LA#': { key: '7', freq: 932.33 },
+            
+            // Enarmonia Agudos
+            'REB': { key: '2', freq: 554.37 }, 'MIB': { key: '3', freq: 622.25 },
+            'SOLB':{ key: '5', freq: 739.99 }, 'LAB': { key: '6', freq: 830.61 },
+            'SIB': { key: '7', freq: 932.33 },
+        };
+
+        let audioCtx;
+        let isPlaying = false;
+        let timeouts = [];
+        let currentSequence = []; 
+
+        document.addEventListener('DOMContentLoaded', loadSavedSongs);
+
+        function updateSpeedDisplay(val) {
+            document.getElementById('speedVal').innerText = val + "x";
+        }
+
+        function clearInput() {
+            document.getElementById('inputNotes').value = '';
+            document.getElementById('output').innerHTML = '...';
+            stopMusic();
+        }
+
+        function translateCipher() {
+            stopMusic();
+            const input = document.getElementById('inputNotes').value;
+            const result = parseAndConvert(input);
+            document.getElementById('output').innerHTML = result.html;
+            currentSequence = result.sequence;
+            return result.sequence;
+        }
+
+        function parseAndConvert(input) {
+            const ignoreText = document.getElementById('ignoreText').checked;
+            const lines = input.split('\n');
+            
+            let finalHtml = "";
+            let fullSequence = [];
+            let noteIndexCounter = 0;
+
+            lines.forEach(line => {
+                const trimmedLine = line.trim();
+                
+                if (!trimmedLine) {
+                    if(!ignoreText) finalHtml += "\n";
+                    return;
+                }
+
+                const tokens = trimmedLine.split(/[\s,-]+/);
+                
+                if (ignoreText && tokens.length > 0) {
+                    let firstClean = normalizeToken(tokens[0]);
+                    let isFirstNote = notesMap[firstClean];
+                    if (!isFirstNote) return; 
+                }
+
+                let lineHtml = "";
+                
+                tokens.forEach(token => {
+                    if (!token) return;
+                    
+                    let cleanToken = normalizeToken(token);
+                    let data = notesMap[cleanToken];
+
+                    if (data) {
+                        lineHtml += `<span id="note-${noteIndexCounter}" class="note-char">${data.key}</span> `;
+                        fullSequence.push(data.freq);
+                        noteIndexCounter++;
+                    } else {
+                        lineHtml += `<span class="note-char">?</span> `;
+                        fullSequence.push(0);
+                        noteIndexCounter++;
+                    }
+                });
+
+                finalHtml += lineHtml.trim() + "\n";
+            });
+
+            return { html: finalHtml.trimEnd(), sequence: fullSequence };
+        }
+
+        function normalizeToken(token) {
+            return token
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^a-zA-Z0-9#]/g, "");
+        }
+
+        function playMusic() {
+            stopMusic(); 
+            
+            let sequenceData = currentSequence;
+            if (!sequenceData || sequenceData.length === 0) {
+                sequenceData = translateCipher();
+            }
+            
+            if(sequenceData.length === 0) return;
+
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            isPlaying = true;
+            
+            const baseTempo = 0.35;
+            const speedMultiplier = parseFloat(document.getElementById('speedRange').value);
+            const currentTempo = baseTempo / speedMultiplier;
+
+            sequenceData.forEach((freq, index) => {
+                const delayTime = index * (currentTempo * 1000);
+
+                let t = setTimeout(() => {
+                    if (!isPlaying) return;
+                    
+                    if (freq > 0) {
+                        playPianoSound(freq, currentTempo);
+                    }
+                    
+                    const noteElement = document.getElementById(`note-${index}`);
+                    if (noteElement) {
+                        noteElement.classList.add('note-active');
+                    }
+
+                }, delayTime);
+                
+                timeouts.push(t);
+            });
+            
+            let endT = setTimeout(() => { isPlaying = false; }, sequenceData.length * (currentTempo * 1000) + 500);
+            timeouts.push(endT);
+        }
+
+        function playPianoSound(freq, duration) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.type = 'sine'; 
+            osc.frequency.value = freq;
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+            const decay = duration < 0.4 ? duration : 0.5;
+
+            gain.gain.setValueAtTime(0, now);
+            gain.gain.linearRampToValueAtTime(0.4, now + 0.01); 
+            gain.gain.exponentialRampToValueAtTime(0.001, now + decay); 
+
+            osc.start(now);
+            osc.stop(now + decay + 0.1);
+        }
+
+        function stopMusic() {
+            isPlaying = false;
+            timeouts.forEach(t => clearTimeout(t));
+            timeouts = [];
+            
+            if(audioCtx) {
+                audioCtx.suspend().then(() => audioCtx.resume());
+            }
+
+            const activeNotes = document.querySelectorAll('.note-active');
+            activeNotes.forEach(el => el.classList.remove('note-active'));
+        }
+
+        function saveSong() {
+            const title = document.getElementById('songTitle').value.trim();
+            const notes = document.getElementById('inputNotes').value.trim();
+
+            if (!title || !notes) {
+                alert("Preencha título e notas.");
+                return;
+            }
+
+            let saved = JSON.parse(localStorage.getItem('habboSongs')) || [];
+            saved.push({ title: title, notes: notes });
+            localStorage.setItem('habboSongs', JSON.stringify(saved));
+            
+            document.getElementById('songTitle').value = '';
+            loadSavedSongs();
+        }
+
+        function loadSavedSongs() {
+            const list = document.getElementById('savedList');
+            list.innerHTML = '';
+            let saved = JSON.parse(localStorage.getItem('habboSongs')) || [];
+
+            if(saved.length === 0) {
+                list.innerHTML = '<div style="text-align:center; font-size:8px; color:#777;">Vazio</div>';
+                return;
+            }
+
+            saved.forEach((song, index) => {
+                const div = document.createElement('div');
+                div.className = 'saved-item';
+                
+                const span = document.createElement('span');
+                span.innerText = song.title;
+                span.onclick = () => {
+                    document.getElementById('inputNotes').value = song.notes;
+                    translateCipher();
+                };
+
+                const btn = document.createElement('button');
+                btn.innerText = 'X';
+                btn.onclick = () => deleteSong(index);
+
+                div.appendChild(span);
+                div.appendChild(btn);
+                list.appendChild(div);
+            });
+        }
+
+        function deleteSong(index) {
+            let saved = JSON.parse(localStorage.getItem('habboSongs')) || [];
+            saved.splice(index, 1);
+            localStorage.setItem('habboSongs', JSON.stringify(saved));
+            loadSavedSongs();
+        }
+    </script>
+</body>
+</html>
