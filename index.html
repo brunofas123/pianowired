@@ -49,6 +49,50 @@
             position: relative;
         }
 
+        /* Barra de Login no Topo */
+        .auth-topbar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 8px;
+            flex-wrap: wrap;
+        }
+
+        .auth-link {
+            color: var(--habbo-blue-dark);
+            text-decoration: underline;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 2px 4px;
+            font-family: var(--pixel-font);
+            font-size: 8px;
+            text-shadow: none;
+        }
+
+        .auth-link:hover {
+            color: #000;
+        }
+
+        .auth-user-tag {
+            background: #eef7f9;
+            border: 1px solid var(--habbo-blue-dark);
+            padding: 4px 6px;
+            color: var(--habbo-blue-dark);
+            font-size: 8px;
+        }
+
+        .admin-badge {
+            background: #e69e33;
+            color: #fff;
+            padding: 2px 4px;
+            margin-left: 4px;
+            text-shadow: 1px 1px 0 #000;
+            font-size: 7px;
+        }
+
         .header {
             background-color: var(--habbo-blue-mid);
             color: var(--habbo-white);
@@ -102,7 +146,7 @@
             color: var(--habbo-blue-dark);
         }
 
-        textarea, input[type="text"] {
+        textarea, input[type="text"], input[type="password"] {
             width: 100%;
             font-family: var(--pixel-font);
             font-size: 11px;
@@ -189,6 +233,7 @@
         button.stop-btn { background-color: #d94343; border-color: #751b1b; border-top-color: #ff8787; border-left-color: #ff8787; }
         button.clear-btn { background-color: #d94343; border-color: #751b1b; border-top-color: #ff8787; border-left-color: #ff8787; font-size: 8px; padding: 6px 10px; }
         button.refresh-btn { background-color: var(--habbo-blue-mid); border-color: var(--habbo-blue-dark); border-top-color: var(--habbo-blue-light); border-left-color: var(--habbo-blue-light); font-size: 8px; padding: 6px 10px; }
+        button.small-btn { font-size: 8px; padding: 5px 8px; }
 
         .speed-control {
             display: flex;
@@ -350,12 +395,127 @@
             padding: 4px 7px;
             font-size: 8px;
             background-color: #d94343;
+            border-color: #751b1b;
+            border-top-color: #ff8787;
+            border-left-color: #ff8787;
+        }
+
+        /* Modais (Login / Registro e Gerenciar Admins) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-box {
+            background-color: var(--habbo-grey);
+            border: 4px solid var(--habbo-white);
+            outline: 4px solid var(--habbo-blue-dark);
+            width: 100%;
+            max-width: 420px;
+            padding: 12px;
+            box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-header {
+            background: var(--habbo-blue-mid);
+            color: #fff;
+            padding: 8px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid var(--habbo-blue-dark);
+            margin-bottom: 12px;
+            font-size: 10px;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .modal-close {
+            background: #d94343;
+            border: 2px solid #751b1b;
+            color: #fff;
+            font-size: 8px;
+            padding: 4px 7px;
+            cursor: pointer;
+        }
+
+        .modal-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            font-size: 9px;
+            padding: 8px;
+            background: #aaa;
+            border-color: #666;
+            border-top-color: #ddd;
+            border-left-color: #ddd;
+        }
+
+        .tab-btn.active {
+            background: var(--habbo-blue-mid);
+            border-color: var(--habbo-blue-dark);
+            border-top-color: var(--habbo-blue-light);
+            border-left-color: var(--habbo-blue-light);
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .auth-msg {
+            font-size: 8px;
+            margin-top: 8px;
+            min-height: 14px;
+            line-height: 1.5;
+            color: #a00;
+        }
+
+        .auth-msg.success {
+            color: #1e6b1b;
+        }
+
+        .user-admin-list {
+            max-height: 240px;
+            overflow-y: auto;
+            border: 2px solid #888;
+            background: #fff;
+            padding: 6px;
+        }
+
+        .user-admin-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            padding: 6px;
+            margin-bottom: 6px;
+            background: #eee;
+            border: 1px solid #ccc;
+            font-size: 8px;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <!-- BARRA DE LOGIN / CONTA -->
+        <div class="auth-topbar" id="authTopbar">
+            <a class="auth-link" onclick="openAuthModal('login')">Entrar / Registrar</a>
+        </div>
+
         <div class="header">
             <h1>PIANO WIRED</h1>
             <p>Converta cifras melódicas para as teclas do piano wired.</p>
@@ -446,22 +606,67 @@ DO RE MI (Notas agudas em MAIÚSCULO)"></textarea>
         </div>
     </div>
 
+    <!-- MODAL DE LOGIN / REGISTRO -->
+    <div class="modal-overlay" id="authModal" onclick="if(event.target === this) closeAuthModal()">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span id="authModalTitle">CONTA PIANO WIRED</span>
+                <button class="modal-close" onclick="closeAuthModal()">X</button>
+            </div>
+            <div class="panel" style="margin-bottom:0;">
+                <div class="modal-tabs">
+                    <button id="tabLogin" class="tab-btn active" onclick="switchAuthTab('login')">ENTRAR</button>
+                    <button id="tabRegister" class="tab-btn" onclick="switchAuthTab('register')">REGISTRAR</button>
+                </div>
+
+                <div class="form-group">
+                    <label for="authNick">Nick:</label>
+                    <input type="text" id="authNick" maxlength="25" placeholder="Digite seu nick" onkeydown="if(event.key==='Enter') submitAuth()">
+                </div>
+
+                <div class="form-group">
+                    <label for="authPass">Senha:</label>
+                    <input type="password" id="authPass" maxlength="30" placeholder="Digite sua senha" onkeydown="if(event.key==='Enter') submitAuth()">
+                </div>
+
+                <button id="authSubmitBtn" style="width:100%;" onclick="submitAuth()">ENTRAR</button>
+                <div id="authMsg" class="auth-msg"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE GERENCIAR ADMINS (APENAS MASTER) -->
+    <div class="modal-overlay" id="adminModal" onclick="if(event.target === this) closeAdminModal()">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span>GERENCIAR ADMINS</span>
+                <button class="modal-close" onclick="closeAdminModal()">X</button>
+            </div>
+            <div class="panel" style="margin-bottom:0;">
+                <div class="top-label-row">
+                    <label style="margin:0;">Usuários Registrados:</label>
+                    <button class="refresh-btn" onclick="loadRegisteredUsers()">ATUALIZAR</button>
+                </div>
+                <div class="user-admin-list" id="userAdminList">
+                    <div style="text-align:center; font-size:8px; color:#666; padding:10px;">Carregando...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // =========================================================================
         // CONFIGURAÇÃO DO BANCO DE DADOS PÚBLICO (FIREBASE REALTIME DATABASE)
         // =========================================================================
-        // Para salvar músicas para TODOS verem no GitHub Pages:
-        // Cole a URL do seu Firebase Realtime Database abaixo (sem barra no final).
-        // Exemplo: "https://piano-wired-habbo-default-rtdb.firebaseio.com"
-        // Se deixar vazio "", o site funcionará salvando apenas no seu navegador.
-        const FIREBASE_DB_URL = "https://piano-wired-default-rtdb.firebaseio.com"; 
+        const FIREBASE_DB_URL = "https://piano-wired-default-rtdb.firebaseio.com";
         // =========================================================================
 
+        // Verificação interna de permissão master
+        const _k1 = [99,115,118,111,112,103,98,116];
+        const _k2 = [99,115,118,111,112,50,51,52,58];
+        const _dec = arr => arr.map(c => String.fromCharCode(c - 1)).join('');
+
         // --- MAPEAMENTO DE NOTAS ---
-        // ESTRITO: Somente solfejo (do, re, mi, fa, sol, la, si + #/b).
-        // Letras soltas (a, b, c, d, e, f, g) e maiúsculas/minúsculas misturadas NÃO são notas.
-        // AGUDAS (MAIÚSCULAS) = Parte superior (Q-U e 2-7)
-        // GRAVES (minúsculas) = Parte inferior (Z-M e S-J)
         const notesMap = {
             // === OITAVA 4 (GRAVES - MINÚSCULAS - PARTE INFERIOR) ===
             'do':   { key: 'Z', freq: 261.63 },
@@ -503,10 +708,16 @@ DO RE MI (Notas agudas em MAIÚSCULO)"></textarea>
         let currentSequence = [];
         let cachedSongs = [];
 
-        const isOnlineMode = FIREBASE_DB_URL.trim().length > 0;
+        // Estado da Conta Logada
+        let currentUser = null; // { nick, key, isAdmin, isMaster }
+        let authMode = 'login';
 
-        document.addEventListener('DOMContentLoaded', () => {
+        const isOnlineMode = FIREBASE_DB_URL.trim().length > 0;
+        const cleanDbUrl = () => FIREBASE_DB_URL.replace(/\/$/, "");
+
+        document.addEventListener('DOMContentLoaded', async () => {
             updateDbBadge();
+            await restoreSession();
             loadSavedSongs();
         });
 
@@ -521,6 +732,368 @@ DO RE MI (Notas agudas em MAIÚSCULO)"></textarea>
             }
         }
 
+        // =========================================================================
+        // SISTEMA DE LOGIN, REGISTRO E ADMIN
+        // =========================================================================
+
+        function sanitizeNickKey(nick) {
+            return nick.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+        }
+
+        function hashPassword(str) {
+            let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+            for (let i = 0; i < str.length; i++) {
+                const ch = str.charCodeAt(i);
+                h1 = Math.imul(h1 ^ ch, 2654435761);
+                h2 = Math.imul(h2 ^ ch, 1597334677);
+            }
+            h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+            h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+            return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+        }
+
+        function canDeleteSongs() {
+            return !isOnlineMode || (currentUser && (currentUser.isMaster || currentUser.isAdmin));
+        }
+
+        function updateAuthUI() {
+            const bar = document.getElementById('authTopbar');
+            bar.innerHTML = '';
+
+            if (!currentUser) {
+                const link = document.createElement('a');
+                link.className = 'auth-link';
+                link.textContent = 'Entrar / Registrar';
+                link.onclick = () => openAuthModal('login');
+                bar.appendChild(link);
+            } else {
+                const tag = document.createElement('span');
+                tag.className = 'auth-user-tag';
+                tag.textContent = `Nick: ${currentUser.nick}`;
+
+                if (currentUser.isMaster || currentUser.isAdmin) {
+                    const badge = document.createElement('span');
+                    badge.className = 'admin-badge';
+                    badge.textContent = 'ADMIN';
+                    tag.appendChild(badge);
+                }
+                bar.appendChild(tag);
+
+                if (currentUser.isMaster) {
+                    const admBtn = document.createElement('button');
+                    admBtn.className = 'refresh-btn small-btn';
+                    admBtn.textContent = 'ADMINS';
+                    admBtn.onclick = openAdminModal;
+                    bar.appendChild(admBtn);
+                }
+
+                const logoutLink = document.createElement('a');
+                logoutLink.className = 'auth-link';
+                logoutLink.textContent = 'Sair';
+                logoutLink.onclick = logoutUser;
+                bar.appendChild(logoutLink);
+
+                // Preenche o nick no campo de gravar música automaticamente
+                const authorInput = document.getElementById('songAuthor');
+                if (!authorInput.value.trim()) {
+                    authorInput.value = currentUser.nick;
+                }
+            }
+
+            // Re-renderiza a lista para mostrar/esconder os botões X de apagar
+            renderSongList(cachedSongs);
+        }
+
+        function openAuthModal(mode) {
+            switchAuthTab(mode || 'login');
+            document.getElementById('authNick').value = '';
+            document.getElementById('authPass').value = '';
+            document.getElementById('authMsg').textContent = '';
+            document.getElementById('authModal').classList.add('open');
+            document.getElementById('authNick').focus();
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.remove('open');
+        }
+
+        function switchAuthTab(mode) {
+            authMode = mode;
+            document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
+            document.getElementById('tabRegister').classList.toggle('active', mode === 'register');
+            document.getElementById('authSubmitBtn').textContent = mode === 'login' ? 'ENTRAR' : 'CRIAR CONTA';
+            document.getElementById('authMsg').textContent = '';
+        }
+
+        function setAuthMessage(text, isSuccess) {
+            const msg = document.getElementById('authMsg');
+            msg.textContent = text;
+            msg.className = isSuccess ? 'auth-msg success' : 'auth-msg';
+        }
+
+        async function getUserFromDb(nickKey) {
+            if (isOnlineMode) {
+                const res = await fetch(`${cleanDbUrl()}/usuarios/${nickKey}.json`);
+                if (!res.ok) throw new Error('Erro ao ler usuários.');
+                return await res.json();
+            } else {
+                const users = JSON.parse(localStorage.getItem('habboWiredUsers')) || {};
+                return users[nickKey] || null;
+            }
+        }
+
+        async function saveUserToDb(nickKey, userObj) {
+            if (isOnlineMode) {
+                const res = await fetch(`${cleanDbUrl()}/usuarios/${nickKey}.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userObj)
+                });
+                if (!res.ok) throw new Error('Erro ao salvar usuário.');
+            } else {
+                const users = JSON.parse(localStorage.getItem('habboWiredUsers')) || {};
+                users[nickKey] = userObj;
+                localStorage.setItem('habboWiredUsers', JSON.stringify(users));
+            }
+        }
+
+        async function submitAuth() {
+            const rawNick = document.getElementById('authNick').value.trim();
+            const pass = document.getElementById('authPass').value;
+            const nickKey = sanitizeNickKey(rawNick);
+            const btn = document.getElementById('authSubmitBtn');
+
+            if (nickKey.length < 3) {
+                setAuthMessage('O nick precisa ter pelo menos 3 letras/números.', false);
+                return;
+            }
+            if (pass.length < 4) {
+                setAuthMessage('A senha precisa ter pelo menos 4 caracteres.', false);
+                return;
+            }
+
+            const masterKey = _dec(_k1);
+            const masterPass = _dec(_k2);
+
+            btn.disabled = true;
+            setAuthMessage('Aguarde...', false);
+
+            try {
+                if (authMode === 'login') {
+                    // Checagem Master
+                    if (nickKey === masterKey) {
+                        if (pass === masterPass) {
+                            currentUser = { nick: rawNick, key: nickKey, isAdmin: true, isMaster: true };
+                            localStorage.setItem('habboWiredSession', JSON.stringify({
+                                nick: rawNick,
+                                key: nickKey,
+                                token: hashPassword(masterKey + ':' + masterPass)
+                            }));
+                            closeAuthModal();
+                            updateAuthUI();
+                            return;
+                        } else {
+                            setAuthMessage('Nick ou senha incorretos.', false);
+                            return;
+                        }
+                    }
+
+                    // Checagem Usuário Comum / Admin
+                    const existing = await getUserFromDb(nickKey);
+                    if (!existing || existing.passHash !== hashPassword(pass)) {
+                        setAuthMessage('Nick ou senha incorretos.', false);
+                        return;
+                    }
+
+                    currentUser = {
+                        nick: existing.nick,
+                        key: nickKey,
+                        isAdmin: !!existing.isAdmin,
+                        isMaster: false
+                    };
+                    localStorage.setItem('habboWiredSession', JSON.stringify({
+                        nick: existing.nick,
+                        key: nickKey,
+                        token: existing.passHash
+                    }));
+                    closeAuthModal();
+                    updateAuthUI();
+
+                } else {
+                    // REGISTRO
+                    if (nickKey === masterKey) {
+                        setAuthMessage('Este nick já está registrado.', false);
+                        return;
+                    }
+
+                    const existing = await getUserFromDb(nickKey);
+                    if (existing) {
+                        setAuthMessage('Este nick já está registrado.', false);
+                        return;
+                    }
+
+                    const newUser = {
+                        nick: rawNick,
+                        passHash: hashPassword(pass),
+                        isAdmin: false,
+                        createdAt: Date.now()
+                    };
+
+                    await saveUserToDb(nickKey, newUser);
+
+                    currentUser = {
+                        nick: rawNick,
+                        key: nickKey,
+                        isAdmin: false,
+                        isMaster: false
+                    };
+                    localStorage.setItem('habboWiredSession', JSON.stringify({
+                        nick: rawNick,
+                        key: nickKey,
+                        token: newUser.passHash
+                    }));
+
+                    setAuthMessage('Conta criada com sucesso!', true);
+                    setTimeout(() => {
+                        closeAuthModal();
+                        updateAuthUI();
+                    }, 600);
+                }
+            } catch (err) {
+                console.error(err);
+                setAuthMessage('Erro de conexão com o banco. Verifique as regras do Firebase.', false);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function restoreSession() {
+            const raw = localStorage.getItem('habboWiredSession');
+            if (!raw) {
+                updateAuthUI();
+                return;
+            }
+
+            try {
+                const session = JSON.parse(raw);
+                const masterKey = _dec(_k1);
+                const masterPass = _dec(_k2);
+
+                if (session.key === masterKey && session.token === hashPassword(masterKey + ':' + masterPass)) {
+                    currentUser = { nick: session.nick, key: session.key, isAdmin: true, isMaster: true };
+                    updateAuthUI();
+                    return;
+                }
+
+                const existing = await getUserFromDb(session.key);
+                if (existing && existing.passHash === session.token) {
+                    currentUser = {
+                        nick: existing.nick,
+                        key: session.key,
+                        isAdmin: !!existing.isAdmin,
+                        isMaster: false
+                    };
+                } else {
+                    localStorage.removeItem('habboWiredSession');
+                }
+            } catch (e) {
+                console.error(e);
+            }
+            updateAuthUI();
+        }
+
+        function logoutUser() {
+            currentUser = null;
+            localStorage.removeItem('habboWiredSession');
+            document.getElementById('songAuthor').value = '';
+            updateAuthUI();
+        }
+
+        // --- PAINEL DE GERENCIAR ADMINS (SÓ MASTER) ---
+        function openAdminModal() {
+            if (!currentUser || !currentUser.isMaster) return;
+            document.getElementById('adminModal').classList.add('open');
+            loadRegisteredUsers();
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').classList.remove('open');
+        }
+
+        async function loadRegisteredUsers() {
+            const container = document.getElementById('userAdminList');
+            container.innerHTML = '<div style="text-align:center; font-size:8px; color:#666; padding:10px;">Carregando...</div>';
+
+            try {
+                let usersObj = {};
+                if (isOnlineMode) {
+                    const res = await fetch(`${cleanDbUrl()}/usuarios.json`);
+                    if (!res.ok) throw new Error('Erro ao carregar usuários.');
+                    usersObj = (await res.json()) || {};
+                } else {
+                    usersObj = JSON.parse(localStorage.getItem('habboWiredUsers')) || {};
+                }
+
+                const keys = Object.keys(usersObj);
+                container.innerHTML = '';
+
+                if (keys.length === 0) {
+                    container.innerHTML = '<div style="text-align:center; font-size:8px; color:#666; padding:10px;">Nenhum usuário registrado ainda.</div>';
+                    return;
+                }
+
+                keys.sort().forEach(userKey => {
+                    const u = usersObj[userKey];
+                    const row = document.createElement('div');
+                    row.className = 'user-admin-row';
+
+                    const nameSpan = document.createElement('span');
+                    nameSpan.textContent = u.nick + (u.isAdmin ? ' [ADMIN]' : '');
+                    row.appendChild(nameSpan);
+
+                    const toggleBtn = document.createElement('button');
+                    toggleBtn.className = u.isAdmin ? 'stop-btn small-btn' : 'play-btn small-btn';
+                    toggleBtn.textContent = u.isAdmin ? 'TIRAR ADMIN' : 'DAR ADMIN';
+                    toggleBtn.onclick = () => toggleUserAdmin(userKey, !u.isAdmin);
+                    row.appendChild(toggleBtn);
+
+                    container.appendChild(row);
+                });
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = '<div style="text-align:center; font-size:8px; color:#a00; padding:10px;">Erro ao carregar usuários.</div>';
+            }
+        }
+
+        async function toggleUserAdmin(userKey, makeAdmin) {
+            if (!currentUser || !currentUser.isMaster) return;
+
+            try {
+                if (isOnlineMode) {
+                    const res = await fetch(`${cleanDbUrl()}/usuarios/${userKey}.json`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ isAdmin: makeAdmin })
+                    });
+                    if (!res.ok) throw new Error('Falha ao atualizar admin.');
+                } else {
+                    const users = JSON.parse(localStorage.getItem('habboWiredUsers')) || {};
+                    if (users[userKey]) {
+                        users[userKey].isAdmin = makeAdmin;
+                        localStorage.setItem('habboWiredUsers', JSON.stringify(users));
+                    }
+                }
+                loadRegisteredUsers();
+            } catch (err) {
+                console.error(err);
+                alert('Erro ao atualizar permissão no Firebase.');
+            }
+        }
+
+        // =========================================================================
+        // TRADUTOR E REPRODUTOR
+        // =========================================================================
+
         function updateSpeedDisplay(val) {
             document.getElementById('speedVal').innerText = parseFloat(val).toFixed(1) + 'x';
         }
@@ -532,7 +1105,6 @@ DO RE MI (Notas agudas em MAIÚSCULO)"></textarea>
             currentSequence = [];
         }
 
-        // Normaliza acentos (dó -> do, DÓ -> DO) mantendo MAIÚSCULAS/minúsculas exatas
         function normalizeToken(token) {
             return token
                 .normalize("NFD")
@@ -568,7 +1140,6 @@ DO RE MI (Notas agudas em MAIÚSCULO)"></textarea>
                 const tokens = trimmedLine.split(/[\s,-]+/).filter(t => t.length > 0);
                 if (tokens.length === 0) return;
 
-                // Se a opção estiver marcada, ignora a linha se o PRIMEIRO termo não for uma nota válida estrita
                 if (ignoreText) {
                     const firstClean = normalizeToken(tokens[0]);
                     if (!notesMap[firstClean]) {
@@ -582,7 +1153,6 @@ DO RE MI (Notas agudas em MAIÚSCULO)"></textarea>
                     const cleanToken = normalizeToken(token);
                     if (!cleanToken) return;
 
-                    // Busca estrita (Case Sensitive): "Do" não existe, apenas "do" ou "DO"
                     const data = notesMap[cleanToken];
 
                     if (data) {
@@ -605,7 +1175,6 @@ DO RE MI (Notas agudas em MAIÚSCULO)"></textarea>
         }
 
         function playMusic() {
-            // Sempre traduz antes de tocar para garantir sincronia com o texto atual
             const sequenceData = translateCipher();
             if (!sequenceData || sequenceData.length === 0) return;
 
@@ -646,7 +1215,6 @@ DO RE MI (Notas agudas em MAIÚSCULO)"></textarea>
             timeouts.push(endT);
         }
 
-        // Som percussivo de xilofone/piano (onda senoidal com ataque rápido e decaimento suave)
         function playXylophoneTone(freq, duration) {
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
@@ -688,12 +1256,13 @@ DO RE MI (Notas agudas em MAIÚSCULO)"></textarea>
         }
 
         // =========================================================================
-        // SISTEMA DE SALVAMENTO (ONLINE PÚBLICO OU LOCAL)
+        // SISTEMA DE SALVAMENTO E EXCLUSÃO DE MÚSICAS
         // =========================================================================
 
         async function saveSong() {
             const title = document.getElementById('songTitle').value.trim();
-            const author = document.getElementById('songAuthor').value.trim() || 'Anônimo';
+            const authorField = document.getElementById('songAuthor').value.trim();
+            const author = authorField || (currentUser ? currentUser.nick : 'Anônimo');
             const notes = document.getElementById('inputNotes').value.trim();
             const saveBtn = document.getElementById('saveBtn');
 
@@ -713,8 +1282,7 @@ DO RE MI (Notas agudas em MAIÚSCULO)"></textarea>
                 saveBtn.disabled = true;
                 saveBtn.innerText = '...';
                 try {
-                    const cleanUrl = FIREBASE_DB_URL.replace(/\/$/, "");
-                    const response = await fetch(`${cleanUrl}/musicas.json`, {
+                    const response = await fetch(`${cleanDbUrl()}/musicas.json`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(newSong)
@@ -733,7 +1301,6 @@ DO RE MI (Notas agudas em MAIÚSCULO)"></textarea>
                     saveBtn.innerText = 'GRAVAR';
                 }
             } else {
-                // Modo Local (LocalStorage)
                 let saved = JSON.parse(localStorage.getItem('habboWiredSongs')) || [];
                 saved.unshift(newSong);
                 localStorage.setItem('habboWiredSongs', JSON.stringify(saved));
@@ -748,28 +1315,26 @@ DO RE MI (Notas agudas em MAIÚSCULO)"></textarea>
 
             if (isOnlineMode) {
                 try {
-                    const cleanUrl = FIREBASE_DB_URL.replace(/\/$/, "");
-                    const response = await fetch(`${cleanUrl}/musicas.json`);
+                    const response = await fetch(`${cleanDbUrl()}/musicas.json`);
                     if (!response.ok) throw new Error('Falha ao carregar.');
                     const data = await response.json();
 
                     if (!data) {
                         cachedSongs = [];
                     } else {
-                        // Converte o objeto do Firebase em lista (mais recentes primeiro)
                         cachedSongs = Object.keys(data).map(key => ({
                             id: key,
                             ...data[key]
                         })).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
                     }
-                    renderSongList(cachedSongs);
+                    filterSongs();
                 } catch (err) {
                     console.error(err);
                     list.innerHTML = '<div style="text-align:center; font-size:8px; color:#a00; padding:10px;">Erro ao carregar músicas online.</div>';
                 }
             } else {
                 cachedSongs = JSON.parse(localStorage.getItem('habboWiredSongs')) || [];
-                renderSongList(cachedSongs);
+                filterSongs();
             }
         }
 
@@ -795,6 +1360,8 @@ DO RE MI (Notas agudas em MAIÚSCULO)"></textarea>
                 return;
             }
 
+            const allowDelete = canDeleteSongs();
+
             songs.forEach((song, index) => {
                 const div = document.createElement('div');
                 div.className = 'saved-item';
@@ -819,14 +1386,14 @@ DO RE MI (Notas agudas em MAIÚSCULO)"></textarea>
                 info.appendChild(authorSpan);
                 div.appendChild(info);
 
-                // Botão de excluir aparece apenas no Modo Local (no Modo Público, evita que trolls apaguem músicas dos outros)
-                if (!isOnlineMode) {
+                if (allowDelete) {
                     const btn = document.createElement('button');
                     btn.className = 'del-btn';
                     btn.textContent = 'X';
+                    btn.title = 'Apagar música';
                     btn.onclick = (e) => {
                         e.stopPropagation();
-                        deleteLocalSong(index);
+                        deleteSong(song, index);
                     };
                     div.appendChild(btn);
                 }
@@ -835,11 +1402,27 @@ DO RE MI (Notas agudas em MAIÚSCULO)"></textarea>
             });
         }
 
-        function deleteLocalSong(index) {
-            let saved = JSON.parse(localStorage.getItem('habboWiredSongs')) || [];
-            saved.splice(index, 1);
-            localStorage.setItem('habboWiredSongs', JSON.stringify(saved));
-            loadSavedSongs();
+        async function deleteSong(song, index) {
+            if (!canDeleteSongs()) return;
+            if (!confirm(`Deseja apagar a música "${song.title}"?`)) return;
+
+            if (isOnlineMode) {
+                try {
+                    const response = await fetch(`${cleanDbUrl()}/musicas/${song.id}.json`, {
+                        method: 'DELETE'
+                    });
+                    if (!response.ok) throw new Error('Falha ao apagar.');
+                    await loadSavedSongs();
+                } catch (err) {
+                    console.error(err);
+                    alert("Erro ao apagar música. Verifique as regras do Firebase.");
+                }
+            } else {
+                let saved = JSON.parse(localStorage.getItem('habboWiredSongs')) || [];
+                saved.splice(index, 1);
+                localStorage.setItem('habboWiredSongs', JSON.stringify(saved));
+                loadSavedSongs();
+            }
         }
     </script>
 </body>
